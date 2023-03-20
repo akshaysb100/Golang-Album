@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"gin/src/mocks"
+	"gin/src/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
-	httptest "net/http/httptest"
-	"reflect"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -14,82 +15,19 @@ func TestOfferInputForBeverageItems(t *testing.T) {
 	t.Run("Test_albums_GetAlbums", func(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
+		mockAlbums := mocks.NewMockAlbums(mockCtrl)
 		recorder := &httptest.ResponseRecorder{}
 		recorder = httptest.NewRecorder()
 		context := &gin.Context{}
 		context, _ = gin.CreateTestContext(recorder)
-		albums := NewAlbum()
+		albums := NewAlbum(mockAlbums)
+		var album = []model.Album{
+			{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+			{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+			{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+		}
+		mockAlbums.EXPECT().GetAlbum().Return(album)
 		albums.GetAlbums(context)
 		assert.Equal(t, http.StatusOK, recorder.Code)
 	})
-}
-
-func TestNewAlbum(t *testing.T) {
-	tests := []struct {
-		name string
-		want Albums
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewAlbum(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewAlbum() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_albums_GetAlbumByID(t *testing.T) {
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			a := albums{}
-			a.GetAlbumByID(tt.args.c)
-		})
-	}
-}
-
-func Test_albums_GetAlbums(t *testing.T) {
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			a := albums{}
-			a.GetAlbums(tt.args.c)
-		})
-	}
-}
-
-func Test_albums_PostAlbums(t *testing.T) {
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			a := albums{}
-			a.PostAlbums(tt.args.c)
-		})
-	}
 }

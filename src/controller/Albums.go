@@ -2,6 +2,7 @@ package controller
 
 import (
 	"gin/src/model"
+	"gin/src/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -13,14 +14,18 @@ type Albums interface {
 }
 
 type albums struct {
+	service service.Albums
 }
 
-func NewAlbum() Albums {
-	return &albums{}
+func NewAlbum(service service.Albums) Albums {
+	return &albums{
+		service: service,
+	}
 }
 
 func (a albums) GetAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, album)
+	getAlbum := a.service.GetAlbum()
+	c.IndentedJSON(http.StatusOK, getAlbum)
 }
 
 func (a albums) GetAlbumByID(c *gin.Context) {
@@ -28,7 +33,8 @@ func (a albums) GetAlbumByID(c *gin.Context) {
 
 	// Loop through the list of albums, looking for
 	// an album whose ID value matches the parameter.
-	for _, a := range album {
+	getAlbum := a.service.GetAlbum()
+	for _, a := range getAlbum {
 		if a.ID == id {
 			c.IndentedJSON(http.StatusOK, a)
 			return
@@ -46,13 +52,8 @@ func (a albums) PostAlbums(c *gin.Context) {
 		return
 	}
 
-	// Add the new album to the slice.
-	album = append(album, newAlbum)
+	getAlbum := a.service.GetAlbum()
+	// Add the new getAlbum to the slice.
+	getAlbum = append(getAlbum, newAlbum)
 	c.IndentedJSON(http.StatusCreated, newAlbum)
-}
-
-var album = []model.Album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
